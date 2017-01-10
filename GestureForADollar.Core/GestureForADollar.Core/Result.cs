@@ -16,10 +16,23 @@ namespace GestureForADollar.Core
 			set;
 		}
 
+		public bool HasMatch
+		{
+			get
+			{
+				return Score > 0;
+			}
+		}
+
 		public Result(string name, double score)
 		{
 			this.Name = name;
 			this.Score = score;
+		}
+
+		public static Result TooFewPoints()
+		{
+			return new Result("Too few points", -1);
 		}
 	}
 }

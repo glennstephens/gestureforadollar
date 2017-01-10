@@ -11,8 +11,14 @@ namespace GestureForADollar.Core
 
 		public Unistroke(string name, List<Point> points)
 		{
-			Points = points;
-			Name = name;
+			this.Name = name;
+
+			var resampled = PointsHelpers.Resample(points, PointsHelpers.NumPoints);
+			var radians = PointsHelpers.IndicativeAngle(resampled);
+			var rotated = PointsHelpers.RotateBy(resampled, -radians);
+			var scaled = PointsHelpers.ScaleTo(rotated, PointsHelpers.SquareSize);
+			Points = PointsHelpers.TranslateTo(scaled, PointsHelpers.Origin);
+			Vector = PointsHelpers.Vectorize(Points); // for Protractor
 		}
 	}
 }

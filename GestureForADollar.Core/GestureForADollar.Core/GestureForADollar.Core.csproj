@@ -53,6 +53,7 @@
     <Compile Include="Unistroke.cs" />
     <Compile Include="DollarRecognizer.cs" />
     <Compile Include="UnistrokeSamples.cs" />
+    <Compile Include="PointsHelpers.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

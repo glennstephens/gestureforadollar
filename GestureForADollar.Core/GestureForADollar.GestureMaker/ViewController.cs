@@ -16,6 +16,8 @@ namespace GestureForADollar.GestureMaker
 
 		DollarRecognizer recognizer = new DollarRecognizer();
 
+
+
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
@@ -27,7 +29,18 @@ namespace GestureForADollar.GestureMaker
 				.AddGesture(UnistrokeSamples.Circle)
 				.AddGesture(UnistrokeSamples.Check)
 				.AddGesture(UnistrokeSamples.Arrow)
-				.AddGesture(UnistrokeSamples.Caret);
+				.AddGesture(UnistrokeSamples.Rectangle)
+				.AddGesture(UnistrokeSamples.LeftSquareBracket)
+				.AddGesture(UnistrokeSamples.RightSquareBracket)
+				.AddGesture(UnistrokeSamples.LeftCurlyBrace)
+				.AddGesture(UnistrokeSamples.RightCurlyBrace)
+				.AddGesture(UnistrokeSamples.Delete)
+				.AddGesture(UnistrokeSamples.Triangle)
+				.AddGesture(UnistrokeSamples.Caret)
+				.AddGesture(UnistrokeSamples.Pigtail)
+				.AddGesture(UnistrokeSamples.V)
+				.AddGesture(UnistrokeSamples.X)
+				.AddGesture(UnistrokeSamples.ZigZag);
 
 			this.View = new DrawableView(View.Frame, allPoints);
 		}
@@ -75,6 +88,11 @@ namespace GestureForADollar.GestureMaker
 			var location = touch.LocationInView(this.View);
 			allPoints.Add(new Point(location.X, location.Y));
 
+			//touch.Force;
+			//touch.AltitudeAngle;
+			//touch.MaximumPossibleForce;
+			//touch.Type = UITouchType.Stylus;
+
 			View.SetNeedsDisplay();
 		}
 
@@ -101,8 +119,8 @@ namespace GestureForADollar.GestureMaker
 			AddPoint(touches);
 
 			// Start the recognition
-			var item = recognizer.Recognize(allPoints, true);
-			NavigationItem.Prompt = item.Name + " " + item.Score.ToString();
+			var item = recognizer.Recognize(allPoints);
+			NavigationItem.Prompt = string.Format("{0} - {1}", item.Name, item.Score);
 		}
 	}
 }
