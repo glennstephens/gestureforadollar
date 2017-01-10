@@ -15,13 +15,11 @@ namespace GestureForADollar.Core
 		public static double AnglePrecision = PointsHelpers.DegreesToRadians(2.0);
 		public static double Phi = 0.5 * (-1.0 + Math.Sqrt(5.0)); // Golden Ratio
 
-		// Checked
 		public static double DegreesToRadians(double angle)
 		{
 			return angle * Math.PI / 180;
 		}
 
-		// Checked
 		public static double Distance(Point p1, Point p2)
 		{
 			var dx = p2.X - p1.X;
@@ -29,7 +27,6 @@ namespace GestureForADollar.Core
 			return Math.Sqrt(dx * dx + dy * dy);
 		}
 
-		// Checked
 		public static double PathLength(List<Point> points)
 		{
 			var d = 0.0;
@@ -40,7 +37,6 @@ namespace GestureForADollar.Core
 			return d;
 		}
 
-		// Checked. May need to validate
 		public static List<Point> Resample(List<Point> points, int n)
 		{
 			var I = PathLength(points) / ((double)n - 1); // interval length
@@ -67,14 +63,12 @@ namespace GestureForADollar.Core
 			return newpoints;
 		}
 
-		// Checked
 		public static double IndicativeAngle(List<Point> points)
 		{
 			var c = Centroid(points);
 			return Math.Atan2(c.Y - points[0].Y, c.X - points[0].X);
 		}
 
-		// Checked
 		public static List<Point> RotateBy(List<Point> points, double radians) // rotates points around centroid
 		{
 			var c = Centroid(points);
@@ -106,7 +100,6 @@ namespace GestureForADollar.Core
 			return newpoints;
 		}
 
-		// Checked
 		public static List<Point> TranslateTo(List<Point> points, Point pt) // translates points' centroid
 		{
 			var c = Centroid(points);
@@ -120,7 +113,6 @@ namespace GestureForADollar.Core
 			return newpoints;
 		}
 
-		// Checked
 		public static List<double> Vectorize(List<Point> points) // for Protractor
 		{
 			var sum = 0.0;
@@ -139,7 +131,6 @@ namespace GestureForADollar.Core
 			return vector;
 		}
 
-		// Checked
 		public static double OptimalCosineDistance(List<double> v1, List<double> v2) // for Protractor
 		{
 			var a = 0.0;
@@ -155,7 +146,6 @@ namespace GestureForADollar.Core
 			return Math.Acos(a * Math.Cos(angle) + b * Math.Sin(angle));
 		}
 
-		// Checked
 		public static double DistanceAtBestAngle(List<Point> points, Unistroke stroke, double a, double b, double threshold)
 		{
 			var x1 = PointsHelpers.Phi * a + (1.0 - PointsHelpers.Phi) * b;
@@ -183,14 +173,12 @@ namespace GestureForADollar.Core
 			return Math.Min(f1, f2);
 		}
 
-		// Checked
 		public static double DistanceAtAngle(List<Point> points, Unistroke stroke, double radians)
 		{
 			var newpoints = RotateBy(points, radians);
 			return PathDistance(newpoints, stroke.Points);
 		}
 
-		// Checked
 		public static Point Centroid(List<Point> points)
 		{
 			var x = 0.0;
@@ -207,7 +195,6 @@ namespace GestureForADollar.Core
 			return new Point(x, y);
 		}
 
-		// Checked
 		public static Rectangle BoundingBox(List<Point> points)
 		{
 			var minX = Double.PositiveInfinity;

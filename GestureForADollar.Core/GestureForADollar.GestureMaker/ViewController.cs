@@ -26,10 +26,10 @@ namespace GestureForADollar.GestureMaker
 
 			recognizer
 				.AddGesture(UnistrokeSamples.Star)
-				.AddGesture(UnistrokeSamples.Circle)
+				.AddGesture(UnistrokeSamples.Circle, true)
 				.AddGesture(UnistrokeSamples.Check)
 				.AddGesture(UnistrokeSamples.Arrow)
-				.AddGesture(UnistrokeSamples.Rectangle)
+				.AddGesture(UnistrokeSamples.Rectangle, true)
 				.AddGesture(UnistrokeSamples.LeftSquareBracket)
 				.AddGesture(UnistrokeSamples.RightSquareBracket)
 				.AddGesture(UnistrokeSamples.LeftCurlyBrace)

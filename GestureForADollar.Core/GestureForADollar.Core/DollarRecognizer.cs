@@ -5,8 +5,6 @@ namespace GestureForADollar.Core
 {
 	public class DollarRecognizer
 	{
-
-
 		public List<Unistroke> Unistrokes { get; set; } = new List<Unistroke>();
 
 		public Result Recognize(List<Point> points, bool useProtractor = true)
@@ -36,14 +34,21 @@ namespace GestureForADollar.Core
 					u = i; // unistroke
 				}
 			}
-			return (u == -1) ? new Result("No match.", 0.0) : new Result(this.Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / PointsHelpers.HalfDiagonal);
+			return (u == -1) ? new Result("No match.", 0.0) : new Result(Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / PointsHelpers.HalfDiagonal);
 		}
 
-		public DollarRecognizer AddGesture(Unistroke stroke)
+		public DollarRecognizer AddGesture(Unistroke stroke, bool addReverse = false)
 		{
-			//var normalised = PointsHelpers.Resample(stroke.Points, PointsHelpers.NumPoints);
-			//stroke.Vector = PointsHelpers.Vectorize(normalised);
 			Unistrokes.Add(stroke);
+
+			if (addReverse)
+			{
+				var reversedPoints = new List<Point>();
+				for (int i = stroke.OriginalPoints.Count - 1; i >= 0; i--)
+					reversedPoints.Add(stroke.OriginalPoints[i]);
+
+				Unistrokes.Add(new Unistroke(stroke.Name, reversedPoints));
+			}
 
 			return this;
 		}
