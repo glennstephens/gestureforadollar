@@ -11,7 +11,9 @@ namespace GestureForADollar.Core
 		{
 			if (points.Count < 4)
 				return Result.TooFewPoints();
-			
+
+			Rectangle rect = PointsHelpers.BoundingBox(points);
+
 			points = PointsHelpers.Resample(points, PointsHelpers.NumPoints);
 			var radians = PointsHelpers.IndicativeAngle(points);
 			points = PointsHelpers.RotateBy(points, -radians);
@@ -34,7 +36,18 @@ namespace GestureForADollar.Core
 					u = i; // unistroke
 				}
 			}
-			return (u == -1) ? new Result("No match.", 0.0) : new Result(Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / PointsHelpers.HalfDiagonal);
+			return (u == -1) ? 
+				new Result("No match.", 0.0, 0, Rectangle.Empty) : 
+				new Result(Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / PointsHelpers.HalfDiagonal, radians, rect);
+		}
+
+		private void AddReverseOfStroke(Unistroke stroke)
+		{
+			var reversedPoints = new List<Point>();
+			for (int i = stroke.OriginalPoints.Count - 1; i >= 0; i--)
+				reversedPoints.Add(stroke.OriginalPoints[i]);
+
+			Unistrokes.Add(new Unistroke(stroke.Name, reversedPoints));
 		}
 
 		public DollarRecognizer AddGesture(Unistroke stroke, bool addReverse = false)
@@ -42,13 +55,7 @@ namespace GestureForADollar.Core
 			Unistrokes.Add(stroke);
 
 			if (addReverse)
-			{
-				var reversedPoints = new List<Point>();
-				for (int i = stroke.OriginalPoints.Count - 1; i >= 0; i--)
-					reversedPoints.Add(stroke.OriginalPoints[i]);
-
-				Unistrokes.Add(new Unistroke(stroke.Name, reversedPoints));
-			}
+				AddReverseOfStroke(stroke);
 
 			return this;
 		}

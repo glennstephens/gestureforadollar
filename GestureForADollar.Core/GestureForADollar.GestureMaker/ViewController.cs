@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using GestureForADollar.Core;
 using UIKit;
@@ -15,8 +16,6 @@ namespace GestureForADollar.GestureMaker
 		}
 
 		DollarRecognizer recognizer = new DollarRecognizer();
-
-
 
 		public override void ViewDidLoad()
 		{
@@ -85,6 +84,10 @@ namespace GestureForADollar.GestureMaker
 		void AddPoint(Foundation.NSSet touches)
 		{
 			var touch = touches.AnyObject as UITouch;
+
+			if (touch.Type != UITouchType.Stylus)
+				return;
+			
 			var location = touch.LocationInView(this.View);
 			allPoints.Add(new Point(location.X, location.Y));
 
@@ -112,7 +115,7 @@ namespace GestureForADollar.GestureMaker
 			AddPoint(touches);
 		}
 
-		public override void TouchesEnded(Foundation.NSSet touches, UIEvent evt)
+		public async override void TouchesEnded(Foundation.NSSet touches, UIEvent evt)
 		{
 			base.TouchesEnded(touches, evt);
 
@@ -120,7 +123,23 @@ namespace GestureForADollar.GestureMaker
 
 			// Start the recognition
 			var item = recognizer.Recognize(allPoints);
-			NavigationItem.Prompt = string.Format("{0} - {1}", item.Name, item.Score);
+			string display = string.Format("{0} - {1}, {2}", item.Name, item.Score, item.IndicativeAngleInDegrees);
+			NavigationItem.Prompt = display;
+
+			UILabel lbl = new UILabel();
+			lbl.Frame = new CGRect(item.BoundingRectangle.X, item.BoundingRectangle.Y, item.BoundingRectangle.Width, item.BoundingRectangle.Height);
+			lbl.BackgroundColor = UIColor.FromRGBA(0, 0, 255, 100);
+			lbl.Lines = 0;
+			lbl.LineBreakMode = UILineBreakMode.CharacterWrap;
+			lbl.Text = display;
+			Add(lbl);
+
+			await Task.Delay(4000);
+			await UIView.AnimateAsync(0.4, () =>
+			{
+				lbl.Alpha = 0;
+			});
+			lbl.RemoveFromSuperview();
 		}
 	}
 }

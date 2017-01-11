@@ -16,5 +16,13 @@ namespace GestureForADollar.Core
 			this.Width = width;
 			this.Height = height;
 		}
+
+		public static Rectangle Empty
+		{
+			get
+			{
+				return new Rectangle(0, 0, 0, 0);
+			}
+		}
 	}
 }

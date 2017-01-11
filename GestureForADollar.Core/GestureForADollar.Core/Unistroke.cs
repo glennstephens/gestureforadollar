@@ -10,12 +10,22 @@ namespace GestureForADollar.Core
 		public List<Point> Points { get; set; }
 		public List<double> Vector { get; set; }
 
-		public Unistroke(string name, List<Point> points)
+		protected void Initialize(string name, List<Point> points)
 		{
 			this.Name = name;
 			this.OriginalPoints = points;
+		}
 
-			var resampled = PointsHelpers.Resample(points, PointsHelpers.NumPoints);
+		public Unistroke(string name, List<Point> points)
+		{
+			Initialize(name, points);
+
+			Setup();
+		}
+
+		protected virtual void Setup()
+		{
+			var resampled = PointsHelpers.Resample(OriginalPoints, PointsHelpers.NumPoints);
 			var radians = PointsHelpers.IndicativeAngle(resampled);
 			var rotated = PointsHelpers.RotateBy(resampled, -radians);
 			var scaled = PointsHelpers.ScaleTo(rotated, PointsHelpers.SquareSize);

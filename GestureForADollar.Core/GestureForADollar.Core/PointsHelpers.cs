@@ -5,6 +5,7 @@ namespace GestureForADollar.Core
 {
 	public static class PointsHelpers
 	{
+		// Items defined for $1
 		public static int NumUnistrokes = 16;
 		public static int NumPoints = 64;
 		public static double SquareSize = 250.0;
@@ -15,9 +16,19 @@ namespace GestureForADollar.Core
 		public static double AnglePrecision = PointsHelpers.DegreesToRadians(2.0);
 		public static double Phi = 0.5 * (-1.0 + Math.Sqrt(5.0)); // Golden Ratio
 
+		// Items used for $N
+		public static int StartAngleIndex = (NumPoints / 8); // eighth of gesture length
+		public static double AngleSimilarityThreshold = DegreesToRadians(30.0);
+		public static double OneDThreshold = 0.25; // customize to desired gesture set (usually 0.20 - 0.35)
+
 		public static double DegreesToRadians(double angle)
 		{
 			return angle * Math.PI / 180;
+		}
+
+		public static double RadiansToDegree(double angle)
+		{
+			return angle * (180.0 / Math.PI);
 		}
 
 		public static double Distance(Point p1, Point p2)
@@ -100,6 +111,20 @@ namespace GestureForADollar.Core
 			return newpoints;
 		}
 
+		public static List<Point> ScaleDimTo(List<Point> points, double size, double ratio1D) // scales bbox uniformly for 1D, non-uniformly for 2D
+		{
+			var B = BoundingBox(points);
+			var uniformly = Math.Min(B.Width / B.Height, B.Height / B.Width) <= ratio1D; // 1D or 2D gesture test
+			var newpoints = new List<Point>();
+			for (var i = 0; i < points.Count; i++)
+			{
+				var qx = uniformly ? points[i].X * (size / Math.Max(B.Width, B.Height)) : points[i].X * (size / B.Width);
+				var qy = uniformly ? points[i].Y * (size / Math.Max(B.Width, B.Height)) : points[i].Y * (size / B.Height);
+				newpoints.Add(new Point(qx, qy));
+			}
+			return newpoints;
+		}
+
 		public static List<Point> TranslateTo(List<Point> points, Point pt) // translates points' centroid
 		{
 			var c = Centroid(points);
@@ -129,6 +154,67 @@ namespace GestureForADollar.Core
 				vector[i] /= magnitude;
 
 			return vector;
+		}
+
+		public static List<double> Vectorize2(List<Point> points, bool useBoundedRotationInvariance) // for $N based calculations
+		{
+			var cos = 1.0;
+			var sin = 0.0;
+			if (useBoundedRotationInvariance)
+			{
+				var iAngle = Math.Atan2(points[0].Y, points[0].X);
+				var baseOrientation = (Math.PI / 4.0) * Math.Floor((iAngle + Math.PI / 8.0) / (Math.PI / 4.0));
+				cos = Math.Cos(baseOrientation - iAngle);
+				sin = Math.Sin(baseOrientation - iAngle);
+			}
+			var sum = 0.0;
+			var vector = new List<double>();
+			for (var i = 0; i < points.Count; i++)
+			{
+				var newX = points[i].X * cos - points[i].Y * sin;
+				var newY = points[i].Y * cos + points[i].X * sin;
+				vector.Add(newX);
+				vector.Add(newY);
+				sum += newX * newX + newY * newY;
+			}
+			var magnitude = Math.Sqrt(sum);
+			for (var i = 0; i < vector.Count; i++)
+				vector[i] /= magnitude;
+			return vector;
+		}
+
+		public static Point CalcStartUnitVector(List<Point> points, int index) // start angle from points[0] to points[index] normalized as a unit vector
+		{
+			var v = new Point(points[index].X - points[0].X, points[index].Y - points[0].Y);
+			var len = Math.Sqrt(v.X * v.X + v.Y * v.Y);
+			return new Point(v.X / len, v.Y / len);
+		}
+
+		public static void HeapPermute(int n, List<int> order, List<int>/*out*/ orders)
+		{
+			if (n == 1)
+			{
+				orders.AddRange(order); // append copy
+			}
+			else
+			{
+				for (var i = 0; i < n; i++)
+				{
+					HeapPermute(n - 1, order, orders);
+					if (n % 2 == 1) // swap 0, n-1
+					{
+						var tmp = order[0];
+						order[0] = order[n - 1];
+						order[n - 1] = tmp;
+					}
+					else // swap i, n-1
+					{
+						var tmp = order[i];
+						order[i] = order[n - 1];
+						order[n - 1] = tmp;
+					}
+				}
+			}
 		}
 
 		public static double OptimalCosineDistance(List<double> v1, List<double> v2) // for Protractor
